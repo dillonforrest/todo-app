@@ -16,7 +16,7 @@ function TodoItem(props) {
   </li>);
 
   const readOnly = (<li key={props.id}>
-    <Checkbox checked={props.isComplete} onChange={props.toggleComplete}>
+    <Checkbox checked={props.isComplete} onChange={() => props.toggleComplete(props.id)}>
       <span onClick={() => props.onReadOnlyClick(props.id)}
         {props.readOnlyValue}
       </span>
@@ -34,7 +34,7 @@ function TodoList(props) {
   return (<div>
     <p>Showing {props.filter}</p>
     <ul>
-      {props.todos.filter(filterer).map(TodoItem)}
+      {props.todos.filter(filterer).map(todo => <TodoItem {...todo} toggleComplete={props.toggleComplete} />)}
     </ul>
   </div>);
 }

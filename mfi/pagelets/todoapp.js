@@ -1,16 +1,29 @@
-import { pagelets } from 'lambdagrid-mfi';
+import { pagelets, appState } from 'lambdagrid-mfi';
 
 const TodoApp = pagelets.createPagelet();
 
-function transform(appState) {
+function onEditableChange({ keyCode }) {
+  const escapeKeyPressed = keyCode == 27;
+  if (escapeKeyPressed) {
+    appState.updater('cancelEditable');
+  } else {
+    appState.updater('onEditableChange');
+  }
+}
+
+function transform(newState) {
   return {
-    ...appState,
-    setFilter: newFilter => 
+    ...newState,
+    setFilter: appState.updater('setFilter'),
+    onEditableSubmit: appState.updater('onEditableSubmit'),
+    toggleComplete: appState.updater('toggleComplete'),
+    onReadOnlyClick: appState.updater('createEditable'),
+    onEditableChange,
   };
 }
 
 TodoApp.onRequest(() => ({
-  'status code': '200',
+  'validator': () => true,
   'transform': transform,
   'pageletBody': 'TodoApp'
 }));
