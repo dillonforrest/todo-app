@@ -2,13 +2,27 @@ import { AppState } from 'lambdagrid-mfi';
 
 // First, let's create the updaters
 
-function cancelEditable(prevState) {
-  const nextState = prevState.remove('editable');
+function todoPath(index) {
+  return ['todos', index];
+}
+
+function cancelEditable(prevState, index) {
+  const path = todoPath(index);
+
+  const todo = prevState.getIn(path);
+  const newTodo = todo.set('isEditing', false).set('editableValue', null);
+
+  const nextState = prevState.setIn(path, newTodo);
   return nextState;
 }
 
-function onEditableChange(prevState, newEditableValue) {
-  const nextState = prevState.update('editable', () => newEditable);
+function onEditableChange(prevState, index, newEditableValue) {
+  const path = todoPath(index);
+
+  const todo = prevState.getIn(path);
+  const newTodo = todo.set('editableValue', newEditableValue);
+
+  const nextState = prevState.setIn(path, newTodo);
   return nextState;
 }
 
@@ -18,9 +32,13 @@ function setFilter(prevState, nextFilter) {
 }
 
 function onEditableSubmit(prevState, index) {
-  const newValue = AppState.get('editable');
-  const editableDeleted = cancelEditable(prevState);
-  const nextState = editableDeleted.updateIn(['props', index, 'value'], () => newValue);
+  const path = todoPath(index);
+
+  const todo = prevState.getIn(path);
+  const newValue = todo.get('editableValue');
+  const newTodo = todo.set('isEditing', false).set('value', newValue);
+
+  const nextState = prevState.setIn(path, newTodo);
   return nextState;
 }
 
@@ -30,8 +48,14 @@ function toggleComplete(prevState, index) {
 }
 
 function createEditable(prevState, index) {
-  const newEditable = prevState.getIn(['props', index, 'value']);
-  const nextState = prevState.set('editable', newEditable);
+  const path = todoPath(index);
+
+  const todo = prevState.getIn(path);
+  const initialEditableValue = todo.get('value');
+  const newTodo = todo.set('isEditing', true)
+    .set('editableValue', initialEditableValue);
+
+  const nextState = prevState.setIn(path, newTodo);
   return nextState;
 }
 

@@ -8,17 +8,20 @@ import {
 
 function TodoItem(props) {
   const editable = (<li>
-    <form onSubmit={() => props.onEditableSubmit(props.index)}>
+    <form onSubmit={props.onEditableSubmit}>
       <FormGroup controlId="editable-todo-item">
-        <FormControl type="text" value={props.editableValue} onChange={props.onEditableChange} />
+        <FormControl
+          type="text"
+          value={props.editableValue}
+          onChange={props.onEditableChange} />
       </FormGroup>
     </form>
   </li>);
 
   const readOnly = (<li key={props.index}>
-    <Checkbox checked={props.isComplete} onChange={() => props.toggleComplete(props.index)}>
-      <span onClick={() => props.onReadOnlyClick(props.index)}
-        {props.readOnlyValue}
+    <Checkbox checked={props.isComplete} onChange={props.toggleComplete}>
+      <span onClick={props.onReadOnlyClick}>
+        {props.value}
       </span>
     </Checkbox>
   </li>);
