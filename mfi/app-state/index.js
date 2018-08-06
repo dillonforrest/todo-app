@@ -1,4 +1,4 @@
-import { appState } from 'lambdagrid-mfi';
+import { AppState } from 'lambdagrid-mfi';
 
 // First, let's create the updaters
 
@@ -18,7 +18,7 @@ function setFilter(prevState, nextFilter) {
 }
 
 function onEditableSubmit(prevState, index) {
-  const newValue = appState.get('editable');
+  const newValue = AppState.get('editable');
   const editableDeleted = cancelEditable(prevState);
   const nextState = editableDeleted.updateIn(['props', index, 'value'], () => newValue);
   return nextState;
@@ -35,7 +35,7 @@ function createEditable(prevState, index) {
   return nextState;
 }
 
-appState.registerUpdaters(
+AppState.registerUpdaters(
   cancelEditable,
   onEditableChange,
   setFilter,
@@ -46,23 +46,23 @@ appState.registerUpdaters(
 
 // Then, let's create authenticators.
 
-function anyUser(appState) {
+function anyUser(state) {
   return true;
 }
 
-function atLeastReadAccess(appState) {
-  return appState.getIn(['auth', 'access levels', 'read']);
+function atLeastReadAccess(state) {
+  return AppState.getIn(['auth', 'access levels', 'read']);
 }
 
-function atLeastWriteAccess(appState) {
-  return appState.getIn(['auth', 'access levels', 'write']);
+function atLeastWriteAccess(state) {
+  return AppState.getIn(['auth', 'access levels', 'write']);
 }
 
-function atLeastAdmin(appState) {
-  return appState.getIn(['auth', 'access levels', 'admin']);
+function atLeastAdmin(state) {
+  return AppState.getIn(['auth', 'access levels', 'admin']);
 }
 
-appState.registerAuthenticators({
+AppState.registerAuthenticators({
   anyUser,
   atLeastReadAccess,
   atLeastWriteAccess,
