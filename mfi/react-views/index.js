@@ -1,4 +1,4 @@
-import { pageletBodies } from 'lambdagrid-mfi';
+import { ReactViews } from 'lambdagrid-mfi';
 import React from 'react';
 import {
   FormGroup,
@@ -60,4 +60,4 @@ function TodoApp(props) {
   <Filter props={props} />
 }
 
-pageletBodies.registerPageletBody('TodoApp', TodoApp);
+ReactViews.registerPageletBody('TodoApp', TodoApp);
