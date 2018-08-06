@@ -8,16 +8,16 @@ import {
 
 function TodoItem(props) {
   const editable = (<li>
-    <form onSubmit={props.onEditableSubmit}>
+    <form onSubmit={() => props.onEditableSubmit(props.index)}>
       <FormGroup controlId="editable-todo-item">
         <FormControl type="text" value={props.editableValue} onChange={props.onEditableChange} />
       </FormGroup>
     </form>
   </li>);
 
-  const readOnly = (<li key={props.id}>
-    <Checkbox checked={props.isComplete} onChange={() => props.toggleComplete(props.id)}>
-      <span onClick={() => props.onReadOnlyClick(props.id)}
+  const readOnly = (<li key={props.index}>
+    <Checkbox checked={props.isComplete} onChange={() => props.toggleComplete(props.index)}>
+      <span onClick={() => props.onReadOnlyClick(props.index)}
         {props.readOnlyValue}
       </span>
     </Checkbox>
@@ -34,7 +34,7 @@ function TodoList(props) {
   return (<div>
     <p>Showing {props.filter}</p>
     <ul>
-      {props.todos.filter(filterer).map(todo => <TodoItem {...todo} toggleComplete={props.toggleComplete} />)}
+      {props.todos.filter(filterer).map((todo, i) => <TodoItem {...todo} toggleComplete={props.toggleComplete} index={i} />)}
     </ul>
   </div>);
 }
