@@ -34,7 +34,7 @@ function TodoList(props) {
   return (<div>
     <p>Showing {props.filter}</p>
     <ul>
-      {props.todos.filter(filterer).map((todo, i) => <TodoItem {...todo} toggleComplete={props.toggleComplete} index={i} />)}
+      {props.getFilteredTodos(filterer, TodoItem)}
     </ul>
   </div>);
 }
