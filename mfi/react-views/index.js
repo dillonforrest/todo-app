@@ -30,14 +30,10 @@ function TodoItem(props) {
 }
 
 function TodoList(props) {
-  const filterer = props.filter == 'all' ? () => true
-    : props.filter == 'complete' ? todo => todo.isComplete
-    : todo => !todo.isComplete;
-
   return (<div>
     <p>Showing {props.filter}</p>
     <ul>
-      {props.getFilteredTodos(filterer, TodoItem)}
+      {props.getFilteredTodos(props.todos, TodoItem)}
     </ul>
   </div>);
 }

@@ -1,4 +1,5 @@
-import { Pagelets, AppState, ReactViews } from 'lambdagrid-mfi';
+import { Pagelets } from 'lambdagrid-mfi';
+import { pointTo } from 'lambdagrid-mfi/utils';
 
 function onEditableChange(event, index) {
   const escapeKeyPressed = event.keyCode == 27;
@@ -10,8 +11,13 @@ function onEditableChange(event, index) {
 }
 
 function getFilteredTodos(state) {
-  return function(filterer, TodoItem) {
-    const selectedTodos = state.get('todos').filter(filterer);
+  return function(TodoItem) {
+    const filter = state.get('filter');
+    const filterer = filter == 'all' ? () => true
+      : filter == 'complete' ? todo => todo.get('isComplete') === true
+      : todo => todo.get('isComplete') === false;
+
+    const selectedTodos = todos.filter(filterer);
     const renderedTodos = selectedTodos.map((todo, index) => TodoItem({
       index,
       value: todo.get('value'),
@@ -32,13 +38,13 @@ function transform(newState) {
   return {
     filter: newState.get('filter'),
     setFilter: appState.updater('setFilter'),
-    getFilteredTodos,
+    getFilteredTodos: getFilteredTodos(newState),
   };
 }
 
 const TodoApp = Pagelets.createPagelet({
-  isAuthorized: AppState.getAuthenticator('anyUser'),
-  view: ReactView.getView('TodoApp'),
+  isAuthorized: pointTo('AppState', 'getAuthorizer', 'anyUser'),
+  view: pointTo('ReactViews', 'getReactView', 'TodoApp'),
   transform,
 });
 
