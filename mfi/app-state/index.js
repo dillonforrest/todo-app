@@ -75,15 +75,15 @@ function anyUser(state) {
 }
 
 function atLeastReadAccess(state) {
-  return AppState.getIn(['auth', 'access levels', 'read']);
+  return state.getIn(['auth', 'access levels', 'read']);
 }
 
 function atLeastWriteAccess(state) {
-  return AppState.getIn(['auth', 'access levels', 'write']);
+  return state.getIn(['auth', 'access levels', 'write']);
 }
 
 function atLeastAdmin(state) {
-  return AppState.getIn(['auth', 'access levels', 'admin']);
+  return state.getIn(['auth', 'access levels', 'admin']);
 }
 
 AppState.registerAuthenticators({
