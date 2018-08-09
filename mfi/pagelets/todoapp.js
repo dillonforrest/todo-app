@@ -1,12 +1,13 @@
-import { Pagelets } from 'lambdagrid-mfi';
-import { pointTo } from 'lambdagrid-mfi/utils';
+import { ping } from 'lambdagrid-mfi';
+
+const write = ping.bind(null, 'AppState', 'write');
 
 function onEditableChange(event, index) {
   const escapeKeyPressed = event.keyCode == 27;
   if (escapeKeyPressed) {
-    appState.updater('cancelEditable')(index);
+    write('cancelEditable')(index);
   } else {
-    appState.updater('onEditableChange')(index, event.target.value);
+    write('onEditableChange')(index, event.target.value);
   }
 }
 
@@ -24,9 +25,9 @@ function getFilteredTodos(state) {
       isComplete: todo.get('isComplete'),
       isEditing: todo.get('isEditing'),
       editableValue: todo.get('editableValue'),
-      onEditableSubmit: () => AppState.updater('onEditableSubmit')(index),
-      toggleComplete: () => AppState.updater('toggleComplete')(index),
-      onReadOnlyClick: () => AppState.updater('createEditable')(index),
+      onEditableSubmit: () => write('onEditableSubmit')(index),
+      toggleComplete: () => write('toggleComplete')(index),
+      onReadOnlyClick: () => write('createEditable')(index),
       onEditableChange: e => onEditableChange(e, index),
     }));
 
@@ -34,18 +35,18 @@ function getFilteredTodos(state) {
   };
 }
 
-function transform(newState) {
+function transform(state) {
   return {
-    filter: newState.get('filter'),
-    setFilter: appState.updater('setFilter'),
-    getFilteredTodos: getFilteredTodos(newState),
+    filter: state.get('filter'),
+    setFilter: write('setFilter'),
+    getFilteredTodos: getFilteredTodos(state),
   };
 }
 
-const TodoApp = Pagelets.createPagelet({
-  isAuthorized: pointTo('AppState', 'getAuthorizer', 'anyUser'),
-  view: pointTo('ReactViews', 'getReactView', 'TodoApp'),
+const TodoApp = ping('Pagelets', 'create pagelet', {
+  isAuthorized: ping('AppState', 'get authorizer', 'anyUser'),
+  view: ping('ReactViews', 'get view', 'TodoApp'),
   transform,
 });
 
-Pagelets.registerPagelet({ TodoApp });
+ping('Pagelets', 'set pagelets', { TodoApp });

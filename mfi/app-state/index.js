@@ -1,72 +1,43 @@
-import { AppState } from 'lambdagrid-mfi';
+import { ping } from 'lambdagrid-mfi';
 
 // First, let's create the updaters
 
-function todoPath(index) {
-  return ['todos', index];
+function cancelEditable(state, index) {
+  return state.setIn(['todos', index, 'isEditing'], false);
 }
 
-function cancelEditable(prevState, index) {
-  const path = todoPath(index);
-
-  const todo = prevState.getIn(path);
-  const newTodo = todo.set('isEditing', false).set('editableValue', null);
-
-  const nextState = prevState.setIn(path, newTodo);
-  return nextState;
+function onEditableChange(state, index, newEditableValue) {
+  return state.setIn(['todos', index, 'editableValue'], newEditableValue);
 }
 
-function onEditableChange(prevState, index, newEditableValue) {
-  const path = todoPath(index);
-
-  const todo = prevState.getIn(path);
-  const newTodo = todo.set('editableValue', newEditableValue);
-
-  const nextState = prevState.setIn(path, newTodo);
-  return nextState;
+function setFilter(state, nextFilter) {
+  return state.set('filter', nextFilter);
 }
 
-function setFilter(prevState, nextFilter) {
-  const nextState = prevState.update('filter', () => nextFilter);
-  return nextState;
+function onEditableSubmit(state, index) {
+  const newValue = state.getIn(['todos', index, 'editableValue']);
+  const update = todo => todo.set('isEditing', false).set('value', newValue);
+  return state.updateIn(['todos', index], update);
 }
 
-function onEditableSubmit(prevState, index) {
-  const path = todoPath(index);
-
-  const todo = prevState.getIn(path);
-  const newValue = todo.get('editableValue');
-  const newTodo = todo.set('isEditing', false).set('value', newValue);
-
-  const nextState = prevState.setIn(path, newTodo);
-  return nextState;
+function toggleComplete(state, index) {
+  return state.updateIn(['todos', index, 'isComplete'], x => !x);
 }
 
-function toggleComplete(prevState, index) {
-  const nextState = prevState.updateIn(['todos', index, 'isComplete'], x => !x);
-  return nextState;
+function createEditable(state, index) {
+  const initialEditableValue = state.getIn(['todos', index, 'value']);
+  const update = todo => todo.set('isEditing', true).set('editableValue', initialEditableValue);
+  return state.updateIn(['todos', index], update);
 }
 
-function createEditable(prevState, index) {
-  const path = todoPath(index);
-
-  const todo = prevState.getIn(path);
-  const initialEditableValue = todo.get('value');
-  const newTodo = todo.set('isEditing', true)
-    .set('editableValue', initialEditableValue);
-
-  const nextState = prevState.setIn(path, newTodo);
-  return nextState;
-}
-
-AppState.registerUpdaters(
+ping('AppState', 'set writers', {
   cancelEditable,
   onEditableChange,
   setFilter,
   onEditableSubmit,
   toggleComplete,
   createEditable,
-);
+});
 
 // Then, let's create authenticators.
 
@@ -86,9 +57,9 @@ function atLeastAdmin(state) {
   return state.getIn(['auth', 'access levels', 'admin']);
 }
 
-AppState.registerAuthenticators({
+ping('AppState', 'set authorizers', {
   anyUser,
   atLeastReadAccess,
   atLeastWriteAccess,
   atLeastAdmin,
-})
+});
